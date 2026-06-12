@@ -100,13 +100,13 @@ VERIFY_IMG = environ.get(
 )
 
 SHORTENER_API = environ.get("SHORTENER_API", "")
-SHORTENER_WEBSITE = environ.get("SHORTENER_WEBSITE", "omegalinks.in")
+SHORTENER_WEBSITE = environ.get("SHORTENER_WEBSITE", "api.gplinks.com")
 
 SHORTENER_API2 = environ.get("SHORTENER_API2", "")
-SHORTENER_WEBSITE2 = environ.get("SHORTENER_WEBSITE2", "omegalinks.in")
+SHORTENER_WEBSITE2 = environ.get("SHORTENER_WEBSITE2", "api.gplinks.com")
 
 SHORTENER_API3 = environ.get("SHORTENER_API3", "")
-SHORTENER_WEBSITE3 = environ.get("SHORTENER_WEBSITE3", "omegalinks.in")
+SHORTENER_WEBSITE3 = environ.get("SHORTENER_WEBSITE3", "api.gplinks.com")
 
 TWO_VERIFY_GAP = get_int("TWO_VERIFY_GAP", 14400)
 THREE_VERIFY_GAP = get_int("THREE_VERIFY_GAP", 14400)
