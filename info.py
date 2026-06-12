@@ -209,7 +209,7 @@ PROTECT_CONTENT = is_enabled(environ.get("PROTECT_CONTENT", "False"), False)
 SPELL_CHECK = is_enabled(environ.get("SPELL_CHECK", "True"), True)
 SPELL_CHECK_REPLY = is_enabled(environ.get("SPELL_CHECK_REPLY", "True"), True)
 
-LINK_MODE = is_enabled(environ.get("LINK_MODE", "True"), True)
+LINK_MODE = is_enabled(environ.get("LINK_MODE", "False"), False)
 STREAM_MODE = is_enabled(environ.get("STREAM_MODE", "True"), True)
 
 # ---------------------------------------------------------------
