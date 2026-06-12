@@ -184,7 +184,7 @@ REACTIONS = ["\ud83d\udc40", "\ud83d\ude31", "\ud83d\udd25", "\ud83d\ude0d", "\u
 FILE_AUTO_DEL_TIMER = get_int("FILE_AUTO_DEL_TIMER", 600)
 
 AUTO_FILTER = is_enabled(environ.get("AUTO_FILTER", "True"), True)
-IS_PM_SEARCH = is_enabled(environ.get("IS_PM_SEARCH", "False"), False)
+IS_PM_SEARCH = is_enabled(environ.get("IS_PM_SEARCH", "True"), True)
 
 PORT = environ.get("PORT", "5000")
 MAX_BTN = get_int("MAX_BTN", 8)
