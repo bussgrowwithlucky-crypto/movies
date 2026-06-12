@@ -39,13 +39,7 @@ async def pm_search(client, message):
  #   if user_id in ADMINS: return
     if str(message.text).startswith('/'):
         return
-    if await db.get_pm_search_status(bot_id):
-        if 'hindi' in message.text.lower() or 'tamil' in message.text.lower() or 'telugu' in message.text.lower() or 'malayalam' in message.text.lower() or 'kannada' in message.text.lower() or 'english' in message.text.lower() or 'gujarati' in message.text.lower(): 
-            return await auto_filter(client, message)
-        await auto_filter(client, message)
-    else:
-        await message.reply_text("<b><i>ɪ ᴀᴍ ɴᴏᴛ ᴡᴏʀᴋɪɴɢ ʜᴇʀᴇ. ꜱᴇᴀʀᴄʜ ᴍᴏᴠɪᴇꜱ ɪɴ ᴏᴜʀ ᴍᴏᴠɪᴇ ꜱᴇᴀʀᴄʜ ɢʀᴏᴜᴘ.</i></b>",
-                                 reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("📝 ᴍᴏᴠɪᴇ ꜱᴇᴀʀᴄʜ ɢʀᴏᴜᴘ ", url=MOVIE_GROUP_LINK or SUPPORT_CHAT)]]))
+    await auto_filter(client, message)
         
     
 @Client.on_message(filters.group & filters.text & filters.incoming)
@@ -1441,7 +1435,10 @@ async def auto_filter(client, msg, spoll=False , pm_mode = False):
                     await ai_sts.delete()
                     return await auto_filter(client, msg)
                 await ai_sts.delete()
-                return await advantage_spell_chok(msg)
+                if message.chat.type != enums.ChatType.PRIVATE:
+                    return await advantage_spell_chok(msg)
+            if message.chat.type == enums.ChatType.PRIVATE:
+                return await message.reply_text(f"<b><i>😔 <code>{search}</code> ʜᴀꜱ ɴᴏᴛ ʙᴇᴇɴ ᴀᴅᴅᴇᴅ ʏᴇᴛ.\n\n⏳ ᴘʟᴇᴀꜱᴇ ᴡᴀɪᴛ ꜰᴏʀ ᴀ ᴍᴏᴍᴇɴᴛ, ɪᴛ ᴡɪʟʟ ʙᴇ ᴀᴅᴅᴇᴅ ꜱᴏᴏɴ.</i></b>")
             return
     else:
         settings = await get_settings(msg.message.chat.id , pm_mode=pm_mode)
