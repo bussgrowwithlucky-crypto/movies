@@ -32,22 +32,10 @@ if not value:
 return []
 return [int(x) if id_pattern.search(x) else x for x in value.split()]
 
-# ---------------------------------------------------------------
-
-# Main Bot Config
-
-# ---------------------------------------------------------------
-
 SESSION = environ.get("SESSION", "Media_search")
 API_ID = get_int("API_ID", 0)
 API_HASH = environ.get("API_HASH", "")
 BOT_TOKEN = environ.get("BOT_TOKEN", "")
-
-# ---------------------------------------------------------------
-
-# Admin / Channels
-
-# ---------------------------------------------------------------
 
 ADMINS = get_id_list("ADMINS")
 USERNAME = environ.get("USERNAME", "")
@@ -56,21 +44,9 @@ LOG_CHANNEL = get_int("LOG_CHANNEL", 0)
 MOVIE_GROUP_LINK = environ.get("MOVIE_GROUP_LINK", "")
 CHANNELS = get_id_list("CHANNELS")
 
-# ---------------------------------------------------------------
-
-# Database
-
-# ---------------------------------------------------------------
-
 DATABASE_URI = environ.get("DATABASE_URI", "")
 DATABASE_NAME = environ.get("DATABASE_NAME", "Cluster0")
 COLLECTION_NAME = environ.get("COLLECTION_NAME", "Telegram_files")
-
-# ---------------------------------------------------------------
-
-# Channel IDs
-
-# ---------------------------------------------------------------
 
 LOG_API_CHANNEL = get_int("LOG_API_CHANNEL", 0)
 BIN_CHANNEL = get_int("BIN_CHANNEL", 0)
@@ -86,12 +62,6 @@ SUPPORT_CHAT = environ.get("SUPPORT_CHAT", "https://t.me/")
 
 AUTH_CHANNEL = int(auth_channel) if auth_channel and id_pattern.search(auth_channel) else None
 REQUEST_CHANNEL = int(request_channel) if request_channel and id_pattern.search(request_channel) else None
-
-# ---------------------------------------------------------------
-
-# Verify / Shortener
-
-# ---------------------------------------------------------------
 
 IS_VERIFY = is_enabled(environ.get("IS_VERIFY", "True"), True)
 
@@ -110,12 +80,6 @@ SHORTENER_WEBSITE3 = environ.get("SHORTENER_WEBSITE3", "omegalinks.in")
 TWO_VERIFY_GAP = get_int("TWO_VERIFY_GAP", 14400)
 THREE_VERIFY_GAP = get_int("THREE_VERIFY_GAP", 14400)
 
-# ---------------------------------------------------------------
-
-# Filters
-
-# ---------------------------------------------------------------
-
 LANGUAGES = [
 "hindi", "english", "telugu", "tamil", "kannada",
 "malayalam", "bengali", "marathi", "gujarati", "punjabi"
@@ -132,12 +96,6 @@ SEASONS = [f"season {i}" for i in range(1, 23)]
 
 REF_PREMIUM = get_int("REF_PREMIUM", 30)
 PREMIUM_POINT = get_int("PREMIUM_POINT", 1500)
-
-# ---------------------------------------------------------------
-
-# Images
-
-# ---------------------------------------------------------------
 
 START_IMG = environ.get(
 "START_IMG",
@@ -158,12 +116,6 @@ SUBSCRIPTION = environ.get(
 )
 
 REACTIONS = ["👀", "😱", "🔥", "😍", "🎉", "🥰", "😇", "⚡"]
-
-# ---------------------------------------------------------------
-
-# Bot Settings
-
-# ---------------------------------------------------------------
 
 FILE_AUTO_DEL_TIMER = get_int("FILE_AUTO_DEL_TIMER", 600)
 
@@ -186,12 +138,6 @@ PROTECT_CONTENT = is_enabled(environ.get("PROTECT_CONTENT", "False"), False)
 SPELL_CHECK = is_enabled(environ.get("SPELL_CHECK", "True"), True)
 LINK_MODE = is_enabled(environ.get("LINK_MODE", "True"), True)
 
-# ---------------------------------------------------------------
-
-# Stream Mode
-
-# ---------------------------------------------------------------
-
 STREAM_MODE = is_enabled(environ.get("STREAM_MODE", "True"), True)
 
 MULTI_CLIENT = False
@@ -200,12 +146,6 @@ PING_INTERVAL = get_int("PING_INTERVAL", 1200)
 
 ON_HEROKU = True if "DYNO" in environ else False
 URL = environ.get("FQDN", "")
-
-# ---------------------------------------------------------------
-
-# Default Settings
-
-# ---------------------------------------------------------------
 
 SETTINGS = {
 "spell_check": SPELL_CHECK,
