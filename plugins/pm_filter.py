@@ -750,14 +750,13 @@ async def cb_handler(client: Client, query: CallbackQuery):
         user_id = query.from_user.id
         has_free_trial = await db.check_trial_status(user_id)
         if has_free_trial:
-            await query.answer(" ʏᴏᴜ'ᴠᴇ ᴀʟʀᴇᴀᴅʏ ᴄʟᴀɪᴍᴇᴅ ʏᴏᴜʀ ꜰʀᴇᴇ ᴛʀɪᴀʟ ᴏɴᴄᴇ !\n\n📌 ᴄʜᴇᴄᴋᴏᴜᴛ ᴏᴜʀ ᴘʟᴀɴꜱ ʙʏ : /plan", show_alert=True)
+            await query.answer(" ʏᴏᴜ'ᴠᴇ ᴀʟʀᴇᴀᴅʏ ᴄʟᴀɪᴍᴇᴅ ʏᴏᴜʀ ꜰʀᴇᴇ ᴛʀɪᴀʟ ᴏɴᴄᴇ !", show_alert=True)
             return
         else:            
             await db.give_free_trial(user_id)
             await query.message.edit_text(
-                text="ᴄᴏɴɢʀᴀᴛᴜʟᴀᴛɪᴏɴꜱ🎉 ʏᴏᴜ ᴄᴀɴ ᴜsᴇ ꜰʀᴇᴇ ᴛʀᴀɪʟ ꜰᴏʀ <u>5 ᴍɪɴᴜᴛᴇs</u> ꜰʀᴏᴍ ɴᴏᴡ !\n\nɴᴏᴡ ᴇxᴘᴇʀɪᴇɴᴄᴇ ᴏᴜʀ ᴘʀᴇᴍɪᴜᴍ ꜱᴇʀᴠɪᴄᴇ ꜰᴏʀ 5 ᴍɪɴᴜᴛᴇꜱ. ᴛᴏ ʙᴜʏ ᴏᴜʀ ᴘʀᴇᴍɪᴜᴍ ꜱᴇʀᴠɪᴄᴇ ᴄʟɪᴄᴋ ᴏɴ ʙᴇʟᴏᴡ ʙᴜᴛᴛᴏɴ.",
-                disable_web_page_preview=True,                  
-                reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("💸 ᴄʜᴇᴄᴋᴏᴜᴛ ᴘʀᴇᴍɪᴜᴍ ᴘʟᴀɴꜱ 💸", callback_data='seeplans')]]))
+                text="ᴄᴏɴɢʀᴀᴛᴜʟᴀᴛɪᴏɴꜱ🎉 ʏᴏᴜ ᴄᴀɴ ᴜsᴇ ꜰʀᴇᴇ ᴛʀᴀɪʟ ꜰᴏʀ <u>5 ᴍɪɴᴜᴛᴇs</u> ꜰʀᴏᴍ ɴᴏᴡ !",
+                disable_web_page_preview=True)
             await client.send_message(LOG_CHANNEL, text=f"#FREE_TRAIL_CLAIMED\n\n👤 ᴜꜱᴇʀ ɴᴀᴍᴇ - {query.from_user.mention}\n⚡ ᴜꜱᴇʀ ɪᴅ - {user_id}", disable_web_page_preview=True)
             return   
 	
@@ -810,7 +809,6 @@ async def cb_handler(client: Client, query: CallbackQuery):
                 InlineKeyboardButton("Hᴇʟᴘ ⚙️", callback_data='admincmd'),
                 InlineKeyboardButton('Aʙᴏᴜᴛ 💌', callback_data=f'about')
                 ],[
-                InlineKeyboardButton('Pʀᴇᴍɪᴜᴍ 🎫', callback_data='seeplans'),
                 InlineKeyboardButton('Rᴇғᴇʀ ⚜️', callback_data="reffff")
                 ],[
                 InlineKeyboardButton('Mᴏsᴛ Sᴇᴀʀᴄʜ 🔍', callback_data="mostsearch"),
