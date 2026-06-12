@@ -1,6 +1,6 @@
 import logging
 from pyrogram.errors import InputUserDeactivated, UserNotParticipant, FloodWait, UserIsBlocked, PeerIdInvalid
-from info import AUTH_CHANNEL, LONG_IMDB_DESCRIPTION, IS_VERIFY , SETTINGS , START_IMG
+from info import AUTH_CHANNEL, LONG_IMDB_DESCRIPTION, IS_VERIFY , SETTINGS , START_IMG, SHORTENER_API, SHORTENER_WEBSITE, SHORTENER_API2, SHORTENER_WEBSITE2, SHORTENER_API3, SHORTENER_WEBSITE3
 from imdb import Cinemagoer
 import asyncio
 from pyrogram.types import Message
@@ -209,12 +209,12 @@ async def get_shortlink(link, grp_id, is_second_shortener=False, is_third_shorte
         settings = SETTINGS
     if IS_VERIFY:
         if is_third_shortener:
-            api, site = settings.get('api_three'), settings.get('shortner_three')
+            api, site = settings.get('api_three') or SHORTENER_API3, settings.get('shortner_three') or SHORTENER_WEBSITE3
         else:
             if is_second_shortener:
-                api, site = settings.get('api_two'), settings.get('shortner_two')
+                api, site = settings.get('api_two') or SHORTENER_API2, settings.get('shortner_two') or SHORTENER_WEBSITE2
             else:
-                api, site = settings.get('api'), settings.get('shortner')
+                api, site = settings.get('api') or SHORTENER_API, settings.get('shortner') or SHORTENER_WEBSITE
         if not api or not site:
             return link
         try:
