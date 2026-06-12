@@ -39,7 +39,7 @@ async def pm_search(client, message):
  #   if user_id in ADMINS: return
     if str(message.text).startswith('/'):
         return
-    await auto_filter(client, message)
+    await auto_filter(client, message, pm_mode=True)
         
     
 @Client.on_message(filters.group & filters.text & filters.incoming)
@@ -1415,7 +1415,7 @@ async def auto_filter(client, msg, spoll=False , pm_mode = False):
                     await asyncio.sleep(2)
                     msg.text = is_misspelled
                     await ai_sts.delete()
-                    return await auto_filter(client, msg)
+                    return await auto_filter(client, msg, pm_mode=pm_mode)
                 await ai_sts.delete()
                 if message.chat.type != enums.ChatType.PRIVATE:
                     return await advantage_spell_chok(msg)
@@ -1440,7 +1440,7 @@ async def auto_filter(client, msg, spoll=False , pm_mode = False):
         for file_num, file in enumerate(files, start=1):
             links += f"""<b>\n\n{file_num}. <a href=https://t.me/{temp.U_NAME}?start={"pm_mode_" if pm_mode else ''}file_{ADMINS[0] if pm_mode else message.chat.id}_{file.file_id}>[{get_size(file.file_size)}] {formate_file_name(file.file_name)}</a></b>"""
     else:
-        btn = [[InlineKeyboardButton(text=f"🔗 {get_size(file.file_size)}≽ {formate_file_name(file.file_name)}", url=f'https://telegram.dog/{temp.U_NAME}?start=file_{message.chat.id}_{file.file_id}'),]
+        btn = [[InlineKeyboardButton(text=f"[{get_size(file.file_size)}] {formate_file_name(file.file_name)}", url=f'https://telegram.dog/{temp.U_NAME}?start=file_{message.chat.id}_{file.file_id}'),]
                for file in files
               ]
     if offset != "":
@@ -1462,14 +1462,19 @@ async def auto_filter(client, msg, spoll=False , pm_mode = False):
                 InlineKeyboardButton("🚸 ɴᴏ ᴍᴏʀᴇ ᴘᴀɢᴇs 🚸", user_id=ADMINS[0])
             ])
     else:
+        BUTTONS[key] = search
         btn.insert(0,[
             InlineKeyboardButton("📥 𝗦𝗲𝗻𝗱 𝗔𝗹𝗹 𝗙𝗶𝗹𝗲𝘀 📥", callback_data=batch_link),
             ])
-
-        btn.insert(1,[
-            InlineKeyboardButton("🚸 ɴᴏ ᴍᴏʀᴇ ᴘᴀɢᴇs 🚸", user_id=ADMINS[0])
+        btn.insert(1, [
+            InlineKeyboardButton("ʟᴀɴɢᴜᴀɢᴇ", callback_data=f"languages#{key}#0#{req}"),
+            InlineKeyboardButton("ǫᴜᴀʟɪᴛʏ", callback_data=f"qualities#{key}#0#{req}"),
+            InlineKeyboardButton("ꜱᴇᴀꜱᴏɴ", callback_data=f"seasons#{key}#0#{req}")
         ])
-                             
+        btn.append([
+            InlineKeyboardButton("1 / 1", callback_data="pages")
+        ])
+
     if spoll:
         m = await msg.message.edit(f"<b><code>{search}</code> ɪs ꜰᴏᴜɴᴅ ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ ꜰᴏʀ ꜰɪʟᴇs 📫</b>")
         await asyncio.sleep(1.2)
@@ -1635,8 +1640,3 @@ async def advantage_spell_chok(message):
     )
     d = await message.reply_text(text=script.CUDNT_FND.format(message.from_user.mention), reply_markup=InlineKeyboardMarkup(buttons), reply_to_message_id=message.id)
     await asyncio.sleep(120)
-    await d.delete()
-    try:
-        await message.delete()
-    except:
-        pass
