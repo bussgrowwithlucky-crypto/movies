@@ -40,7 +40,10 @@ async def invite(client, message):
 
 @Client.on_message(filters.command("start") & filters.incoming)
 async def start(client:Client, message):
-    await message.react(emoji=random.choice(REACTIONS), big=True)
+    try:
+        await message.react(emoji=random.choice(REACTIONS), big=True)
+    except Exception:
+        pass
     pm_mode = False
     try:
          data = message.command[1]
@@ -179,17 +182,22 @@ async def start(client:Client, message):
                         ],[
                             InlineKeyboardButton('Aʙᴏᴜᴛ', callback_data='about'),
                             InlineKeyboardButton('Sʜᴀʀᴇ ᴍᴇ', url=f'https://t.me/share/url?url=https://t.me/{temp.U_NAME}')
-                        ],[
-                            InlineKeyboardButton('Uᴘᴅᴀᴛᴇs', url=SUPPORT_CHAT),
-                            InlineKeyboardButton('Gʀᴏᴜᴘ', url=MOVIE_GROUP_LINK or SUPPORT_CHAT)
                         ]]
+                        if (MOVIE_GROUP_LINK or SUPPORT_CHAT).rstrip('/') != 'https://t.me':
+                            buttons.append([
+                                InlineKeyboardButton('Uᴘᴅᴀᴛᴇs', url=SUPPORT_CHAT if SUPPORT_CHAT.rstrip('/') != 'https://t.me' else MOVIE_GROUP_LINK),
+                                InlineKeyboardButton('Gʀᴏᴜᴘ', url=MOVIE_GROUP_LINK or SUPPORT_CHAT)
+                            ])
                         reply_markup = InlineKeyboardMarkup(buttons)
-                        m=await message.reply_sticker("CAACAgQAAxkBAAEn9_ZmGp1uf1a38UrDhitnjOOqL1oG3gAC9hAAAlC74FPEm2DxqNeOmB4E")
-                        await asyncio.sleep(1)
-                        await m.delete()
-                        await message.reply_photo(photo=random.choice(START_IMG), caption=script.START_TXT.format(message.from_user.mention, get_status(), message.from_user.id),
-                            reply_markup=reply_markup,
-                            parse_mode=enums.ParseMode.HTML)
+                        try:
+                            await message.reply_photo(photo=random.choice(START_IMG), caption=script.START_TXT.format(message.from_user.mention, get_status(), message.from_user.id),
+                                reply_markup=reply_markup,
+                                parse_mode=enums.ParseMode.HTML)
+                        except Exception:
+                            logger.exception("start photo failed, falling back to text")
+                            await message.reply_text(script.START_TXT.format(message.from_user.mention, get_status(), message.from_user.id),
+                                reply_markup=reply_markup,
+                                parse_mode=enums.ParseMode.HTML)
                 try: 
                     if newPoint == 0:
                         await client.send_message(refUserId , script.REF_PREMEUM.format(PREMIUM_POINT))
@@ -205,18 +213,24 @@ async def start(client:Client, message):
         ],[
             InlineKeyboardButton('Aʙᴏᴜᴛ', callback_data='about'),
             InlineKeyboardButton('Sʜᴀʀᴇ ᴍᴇ', url=f'https://t.me/share/url?url=https://t.me/{temp.U_NAME}')
-        ],[
-            InlineKeyboardButton('Uᴘᴅᴀᴛᴇs', url=SUPPORT_CHAT),
-            InlineKeyboardButton('Gʀᴏᴜᴘ', url=MOVIE_GROUP_LINK or SUPPORT_CHAT)
         ]]
+        if (MOVIE_GROUP_LINK or SUPPORT_CHAT).rstrip('/') != 'https://t.me':
+            buttons.append([
+                InlineKeyboardButton('Uᴘᴅᴀᴛᴇs', url=SUPPORT_CHAT if SUPPORT_CHAT.rstrip('/') != 'https://t.me' else MOVIE_GROUP_LINK),
+                InlineKeyboardButton('Gʀᴏᴜᴘ', url=MOVIE_GROUP_LINK or SUPPORT_CHAT)
+            ])
         reply_markup = InlineKeyboardMarkup(buttons)
-        m=await message.reply_sticker("CAACAgQAAxkBAAEn9_ZmGp1uf1a38UrDhitnjOOqL1oG3gAC9hAAAlC74FPEm2DxqNeOmB4E")
-        await asyncio.sleep(1)
-        await m.delete()
-        await message.reply_photo(photo=random.choice(START_IMG), caption=script.START_TXT.format(message.from_user.mention, get_status(), message.from_user.id),
-            reply_markup=reply_markup,
-            parse_mode=enums.ParseMode.HTML
-        )
+        try:
+            await message.reply_photo(photo=random.choice(START_IMG), caption=script.START_TXT.format(message.from_user.mention, get_status(), message.from_user.id),
+                reply_markup=reply_markup,
+                parse_mode=enums.ParseMode.HTML
+            )
+        except Exception:
+            logger.exception("start photo failed, falling back to text")
+            await message.reply_text(script.START_TXT.format(message.from_user.mention, get_status(), message.from_user.id),
+                reply_markup=reply_markup,
+                parse_mode=enums.ParseMode.HTML
+            )
         return
     if AUTH_CHANNEL and not await is_req_subscribed(client, message):
         try:
@@ -264,15 +278,25 @@ async def start(client:Client, message):
         ],[
             InlineKeyboardButton('Aʙᴏᴜᴛ', callback_data='about'),
             InlineKeyboardButton('Sʜᴀʀᴇ ᴍᴇ', url=f'https://t.me/share/url?url=https://t.me/{temp.U_NAME}')
-        ],[
-            InlineKeyboardButton('Uᴘᴅᴀᴛᴇs', url=SUPPORT_CHAT),
-            InlineKeyboardButton('Gʀᴏᴜᴘ', url=MOVIE_GROUP_LINK or SUPPORT_CHAT)
         ]]
+        if (MOVIE_GROUP_LINK or SUPPORT_CHAT).rstrip('/') != 'https://t.me':
+            buttons.append([
+                InlineKeyboardButton('Uᴘᴅᴀᴛᴇs', url=SUPPORT_CHAT if SUPPORT_CHAT.rstrip('/') != 'https://t.me' else MOVIE_GROUP_LINK),
+                InlineKeyboardButton('Gʀᴏᴜᴘ', url=MOVIE_GROUP_LINK or SUPPORT_CHAT)
+            ])
         reply_markup = InlineKeyboardMarkup(buttons)
-        return await message.reply_photo(photo=random.choice(START_IMG), caption=script.START_TXT.format(message.from_user.mention, get_status(), message.from_user.id),
-            reply_markup=reply_markup,
-            parse_mode=enums.ParseMode.HTML
-        )
+        try:
+            await message.reply_photo(photo=random.choice(START_IMG), caption=script.START_TXT.format(message.from_user.mention, get_status(), message.from_user.id),
+                reply_markup=reply_markup,
+                parse_mode=enums.ParseMode.HTML
+            )
+        except Exception:
+            logger.exception("start photo failed, falling back to text")
+            await message.reply_text(script.START_TXT.format(message.from_user.mention, get_status(), message.from_user.id),
+                reply_markup=reply_markup,
+                parse_mode=enums.ParseMode.HTML
+            )
+        return
         
     if data.startswith('pm_mode_'):
         pm_mode = True
