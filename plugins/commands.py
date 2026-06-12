@@ -78,18 +78,30 @@ async def start(client:Client, message):
             msg = script.THIRDT_VERIFY_COMPLETE_TEXT
         else:
             msg = script.SECOND_VERIFY_COMPLETE_TEXT if key == "second_time_verified" else script.VERIFY_COMPLETE_TEXT
-        await client.send_message(settings['log'], script.VERIFIED_LOG_TEXT.format(m.from_user.mention, user_id, dt.now(pytz.timezone('Asia/Kolkata')).strftime('%d %B %Y'), num))
+        try:
+            log_chat = settings.get('log') or LOG_CHANNEL
+            if log_chat:
+                await client.send_message(log_chat, script.VERIFIED_LOG_TEXT.format(m.from_user.mention, user_id, dt.now(pytz.timezone('Asia/Kolkata')).strftime('%d %B %Y'), num))
+        except Exception:
+            pass
         btn = [[
             InlineKeyboardButton("‼️ ᴄʟɪᴄᴋ ʜᴇʀᴇ ᴛᴏ ɢᴇᴛ ꜰɪʟᴇ ‼️", url=f"https://telegram.me/{temp.U_NAME}?start=file_{grp_id}_{file_id}"),
         ]]
         reply_markup=InlineKeyboardMarkup(btn)
-        await m.reply_photo(
-            photo=(VERIFY_IMG),
-            caption=msg.format(message.from_user.mention, get_readable_time(TWO_VERIFY_GAP)),
-            reply_markup=reply_markup,
-            parse_mode=enums.ParseMode.HTML
-        )
-        return 
+        try:
+            await m.reply_photo(
+                photo=(VERIFY_IMG),
+                caption=msg.format(message.from_user.mention, get_readable_time(TWO_VERIFY_GAP)),
+                reply_markup=reply_markup,
+                parse_mode=enums.ParseMode.HTML
+            )
+        except Exception:
+            await m.reply_text(
+                text=msg.format(message.from_user.mention, get_readable_time(TWO_VERIFY_GAP)),
+                reply_markup=reply_markup,
+                parse_mode=enums.ParseMode.HTML
+            )
+        return
         # refer 
     if len(message.command) == 2 and message.command[1].startswith("reff_"):
         try:
@@ -321,7 +333,7 @@ async def start(client:Client, message):
             buttons = [[
                 InlineKeyboardButton(text="🔐 ᴠᴇʀɪꜰʏ ɴᴏᴡ", url=verify)
             ],[
-                InlineKeyboardButton(text="ʜᴏᴡ ᴛᴏ ᴠᴇʀɪғʏ❓", url=settings['tutorial'])
+                InlineKeyboardButton(text="ʜᴏᴡ ᴛᴏ ᴠᴇʀɪғʏ❓", url=settings.get('tutorial') or TUTORIAL or "https://t.me/")
             ]]
             reply_markup=InlineKeyboardMarkup(buttons)
             if await db.user_verified(user_id): 
@@ -347,25 +359,32 @@ async def start(client:Client, message):
             return
         files_to_delete = []
         for file in files:
-            user_id = message.from_user.id 
-            grp_id = temp.CHAT.get(user_id)
+            user_id = message.from_user.id
+            grp_id = temp.CHAT.get(user_id, 0)
             settings = await get_settings(grp_id, pm_mode=pm_mode)
-            CAPTION = settings['caption']
-            f_caption = CAPTION.format(
-                file_name=formate_file_name(file.file_name),
-                file_size=get_size(file.file_size),
-                file_caption=file.caption
-            )
+            CAPTION = settings.get('caption') or FILE_CAPTION
+            try:
+                f_caption = CAPTION.format(
+                    file_name=formate_file_name(file.file_name),
+                    file_size=get_size(file.file_size),
+                    file_caption=file.caption
+                )
+            except Exception:
+                f_caption = formate_file_name(file.file_name)
             btn = [[
                 InlineKeyboardButton("✛ ᴡᴀᴛᴄʜ & ᴅᴏᴡɴʟᴏᴀᴅ ✛", callback_data=f'stream#{file.file_id}')
             ]]
-            toDel = await client.send_cached_media(
-                chat_id=message.from_user.id,
-                file_id=file.file_id,
-                caption=f_caption,
-                reply_markup=InlineKeyboardMarkup(btn)
-            )
-            files_to_delete.append(toDel)
+            try:
+                toDel = await client.send_cached_media(
+                    chat_id=message.from_user.id,
+                    file_id=file.file_id,
+                    caption=f_caption,
+                    reply_markup=InlineKeyboardMarkup(btn)
+                )
+                files_to_delete.append(toDel)
+            except Exception:
+                logger.exception("send_cached_media failed in allfiles")
+                continue
 
         delCap = "<b>ᴀʟʟ {} ғɪʟᴇs ᴡɪʟʟ ʙᴇ ᴅᴇʟᴇᴛᴇᴅ ᴀғᴛᴇʀ {} ᴛᴏ ᴀᴠᴏɪᴅ ᴄᴏᴘʏʀɪɢʜᴛ ᴠɪᴏʟᴀᴛɪᴏɴs!</b>".format(len(files_to_delete), f'{FILE_AUTO_DEL_TIMER / 60} ᴍɪɴᴜᴛᴇs' if FILE_AUTO_DEL_TIMER >= 60 else f'{FILE_AUTO_DEL_TIMER} sᴇᴄᴏɴᴅs')
         afterDelCap = "<b>ᴀʟʟ {} ғɪʟᴇs ᴀʀᴇ ᴅᴇʟᴇᴛᴇᴅ ᴀғᴛᴇʀ {} ᴛᴏ ᴀᴠᴏɪᴅ ᴄᴏᴘʏʀɪɢʜᴛ ᴠɪᴏʟᴀᴛɪᴏɴs!</b>".format(len(files_to_delete), f'{FILE_AUTO_DEL_TIMER / 60} ᴍɪɴᴜᴛᴇs' if FILE_AUTO_DEL_TIMER >= 60 else f'{FILE_AUTO_DEL_TIMER} sᴇᴄᴏɴᴅs')
@@ -384,27 +403,33 @@ async def start(client:Client, message):
     if not data:
         return
 
-    files_ = await get_file_details(file_id)           
+    files_ = await get_file_details(file_id)
     if not files_:
-        pre, file_id = ((base64.urlsafe_b64decode(data + "=" * (-len(data) % 4))).decode("ascii")).split("_", 1)
-        return await message.reply('<b>⚠️ ᴀʟʟ ꜰɪʟᴇs ɴᴏᴛ ꜰᴏᴜɴᴅ ⚠️</b>')
+        return await message.reply('<b>⚠️ ꜰɪʟᴇ ɴᴏᴛ ꜰᴏᴜɴᴅ ⚠️</b>')
     files = files_[0]
     settings = await get_settings(grp_id , pm_mode=pm_mode)
-    CAPTION = settings['caption']
-    f_caption = CAPTION.format(
-        file_name = formate_file_name(files.file_name),
-        file_size = get_size(files.file_size),
-        file_caption=files.caption
-    )
+    CAPTION = settings.get('caption') or FILE_CAPTION
+    try:
+        f_caption = CAPTION.format(
+            file_name = formate_file_name(files.file_name),
+            file_size = get_size(files.file_size),
+            file_caption=files.caption
+        )
+    except Exception:
+        f_caption = formate_file_name(files.file_name)
     btn = [[
         InlineKeyboardButton("✛ ᴡᴀᴛᴄʜ & ᴅᴏᴡɴʟᴏᴀᴅ ✛", callback_data=f'stream#{file_id}')
     ]]
-    toDel=await client.send_cached_media(
-        chat_id=message.from_user.id,
-        file_id=file_id,
-        caption=f_caption,
-        reply_markup=InlineKeyboardMarkup(btn)
-    )
+    try:
+        toDel=await client.send_cached_media(
+            chat_id=message.from_user.id,
+            file_id=file_id,
+            caption=f_caption,
+            reply_markup=InlineKeyboardMarkup(btn)
+        )
+    except Exception:
+        logger.exception("send_cached_media failed for single file")
+        return await message.reply('<b>⚠️ ꜱᴏᴍᴇᴛʜɪɴɢ ᴡᴇɴᴛ ᴡʀᴏɴɢ ᴡʜɪʟᴇ ꜱᴇɴᴅɪɴɢ ʏᴏᴜʀ ꜰɪʟᴇ. ᴘʟᴇᴀꜱᴇ ᴛʀʏ ᴀɢᴀɪɴ ʟᴀᴛᴇʀ.</b>')
     delCap = "<b>ʏᴏᴜʀ ғɪʟᴇ ᴡɪʟʟ ʙᴇ ᴅᴇʟᴇᴛᴇᴅ ᴀғᴛᴇʀ {} ᴛᴏ ᴀᴠᴏɪᴅ ᴄᴏᴘʏʀɪɢʜᴛ ᴠɪᴏʟᴀᴛɪᴏɴs!</b>".format(f'{FILE_AUTO_DEL_TIMER / 60} ᴍɪɴᴜᴛᴇs' if FILE_AUTO_DEL_TIMER >= 60 else f'{FILE_AUTO_DEL_TIMER} sᴇᴄᴏɴᴅs')
     afterDelCap = "<b>ʏᴏᴜʀ ғɪʟᴇ ɪs ᴅᴇʟᴇᴛᴇᴅ ᴀғᴛᴇʀ {} ᴛᴏ ᴀᴠᴏɪᴅ ᴄᴏᴘʏʀɪɢʜᴛ ᴠɪᴏʟᴀᴛɪᴏɴs!</b>".format(f'{FILE_AUTO_DEL_TIMER / 60} ᴍɪɴᴜᴛᴇs' if FILE_AUTO_DEL_TIMER >= 60 else f'{FILE_AUTO_DEL_TIMER} sᴇᴄᴏɴᴅs') 
     replyed = await message.reply(
