@@ -1,4 +1,6 @@
 import re
+import os
+import glob as _glob
 from os import environ
 from Script import script
 
@@ -157,7 +159,8 @@ PREMIUM_POINT = get_int("PREMIUM_POINT", 1500)
 # Images
 # ---------------------------------------------------------------
 
-START_IMG = environ.get(
+_assets_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets")
+START_IMG = _glob.glob(os.path.join(_assets_dir, "*.jpg")) or environ.get(
     "START_IMG",
     "https://i.ibb.co/qpxpGmC/image.jpg https://i.ibb.co/DQ35zLZ/image.jpg",
 ).split()
