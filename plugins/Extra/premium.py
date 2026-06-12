@@ -42,7 +42,8 @@ async def give_premium_cmd_handler(client, message):
     else:
         await message.reply_text("Usage: /add_premium user_id time \n\nExample /add_premium 1252789 10day \n\n(e.g. for time units '1day for days', '1hour for hours', or '1min for minutes', or '1month for months' or '1year for year')")
 
-@Client.on_message(filters.command("myplan"))
+# /myplan disabled (premium feature removed)
+# @Client.on_message(filters.command("myplan"))
 async def check_plans_cmd(client, message):
     user = message.from_user.mention
     user_id  = message.from_user.id
@@ -153,7 +154,8 @@ async def reset_trial(client, message):
         await message.reply_text(f"An error occurred: {e}")
        
 
-@Client.on_message(filters.command("plan"))
+# /plan disabled (premium feature removed)
+# @Client.on_message(filters.command("plan"))
 async def plan(client, message):
     user_id = message.from_user.id 
     users = message.from_user.mention 
