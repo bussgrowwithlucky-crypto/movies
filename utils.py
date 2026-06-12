@@ -208,18 +208,26 @@ async def get_shortlink(link, grp_id, is_second_shortener=False, is_third_shorte
     else:
         settings = SETTINGS
     if IS_VERIFY:
-        if is_third_shortener:             
-            api, site = settings['api_three'], settings['shortner_three']
+        if is_third_shortener:
+            api, site = settings.get('api_three'), settings.get('shortner_three')
         else:
             if is_second_shortener:
-                api, site = settings['api_two'], settings['shortner_two']
+                api, site = settings.get('api_two'), settings.get('shortner_two')
             else:
-                api, site = settings['api'], settings['shortner']
-        shortzy = Shortzy(api, site)
+                api, site = settings.get('api'), settings.get('shortner')
+        if not api or not site:
+            return link
+        try:
+            shortzy = Shortzy(api, site)
+        except Exception:
+            return link
         try:
             link = await shortzy.convert(link)
-        except Exception as e:
-            link = await shortzy.get_quick_link(link)
+        except Exception:
+            try:
+                link = await shortzy.get_quick_link(link)
+            except Exception:
+                pass
     return link
 
 def get_file_id(message: "Message") -> Any:
