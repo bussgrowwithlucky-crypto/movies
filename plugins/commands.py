@@ -53,6 +53,20 @@ async def start(client:Client, message):
         pass
     m = message
     user_id = m.from_user.id
+    if len(m.command) == 2 and m.command[1] == "verify":
+        ist_timezone = pytz.timezone('Asia/Kolkata')
+        await db.update_notcopy_user(user_id, {"last_verified": dt.now(tz=ist_timezone)})
+        try:
+            if LOG_CHANNEL:
+                await client.send_message(LOG_CHANNEL, script.VERIFIED_LOG_TEXT.format(m.from_user.mention, user_id, dt.now(pytz.timezone('Asia/Kolkata')).strftime('%d %B %Y'), 1))
+        except Exception:
+            pass
+        cap = f"<b>✅ ʜᴇʏ {m.from_user.mention}, ʏᴏᴜ ᴀʀᴇ ᴠᴇʀɪꜰɪᴇᴅ ɴᴏᴡ!\n\nɴᴏᴡ ꜱᴇɴᴅ ᴛʜᴇ ᴍᴏᴠɪᴇ ɴᴀᴍᴇ ᴀɢᴀɪɴ ᴀɴᴅ ᴛᴀᴘ ᴛʜᴇ ꜰɪʟᴇ — ɪᴛ ᴡɪʟʟ ʙᴇ ꜱᴇɴᴛ ᴅɪʀᴇᴄᴛʟʏ. 🎬</b>"
+        try:
+            await m.reply_photo(photo=VERIFY_IMG, caption=cap, parse_mode=enums.ParseMode.HTML)
+        except Exception:
+            await m.reply_text(cap, parse_mode=enums.ParseMode.HTML)
+        return
     if len(m.command) == 2 and m.command[1].startswith('notcopy'):
         _, userid, verify_id, file_id = m.command[1].split("_", 3)
         user_id = int(userid)
@@ -326,37 +340,22 @@ async def start(client:Client, message):
         is_second_shortener = await db.use_second_shortener(user_id, settings.get('verify_time', TWO_VERIFY_GAP)) 
         is_third_shortener = await db.use_third_shortener(user_id, settings.get('third_verify_time', THREE_VERIFY_GAP))
         if settings.get("is_verify", IS_VERIFY) and not user_verified or is_second_shortener or is_third_shortener:
-            verify_id = ''.join(random.choices(string.ascii_uppercase + string.digits, k=7))
-            await db.create_verify_id(user_id, verify_id)
             temp.CHAT[user_id] = grp_id
-            raw_verify_link = f"https://telegram.me/{temp.U_NAME}?start=notcopy_{user_id}_{verify_id}_{file_id}"
-            verify = await get_shortlink(raw_verify_link, grp_id, is_second_shortener, is_third_shortener , pm_mode=pm_mode)
             tutorial_url = settings.get('tutorial') or TUTORIAL or "https://t.me/"
             if await db.user_verified(user_id):
                 msg = script.THIRDT_VERIFICATION_TEXT
             else:
                 msg = script.SECOND_VERIFICATION_TEXT if is_second_shortener else script.VERIFICATION_TEXT
-            try:
-                d = await m.reply_text(
-                    text=msg.format(message.from_user.mention, get_status()),
-                    protect_content = False,
-                    reply_markup=InlineKeyboardMarkup([[
-                        InlineKeyboardButton(text="🔐 ᴠᴇʀɪꜰʏ ɴᴏᴡ", url=verify)
-                    ],[
-                        InlineKeyboardButton(text="ʜᴏᴡ ᴛᴏ ᴠᴇʀɪғʏ❓", url=tutorial_url)
-                    ]]),
-                    parse_mode=enums.ParseMode.HTML
-                )
-            except Exception:
-                logger.exception("verify message failed, retrying with raw link")
-                d = await m.reply_text(
-                    text=msg.format(message.from_user.mention, get_status()),
-                    protect_content = False,
-                    reply_markup=InlineKeyboardMarkup([[
-                        InlineKeyboardButton(text="🔐 ᴠᴇʀɪꜰʏ ɴᴏᴡ", url=raw_verify_link)
-                    ]]),
-                    parse_mode=enums.ParseMode.HTML
-                )
+            d = await m.reply_text(
+                text=msg.format(message.from_user.mention, get_status()),
+                protect_content = False,
+                reply_markup=InlineKeyboardMarkup([[
+                    InlineKeyboardButton(text="🔐 ᴠᴇʀɪꜰʏ ɴᴏᴡ", url=VERIFY_LINK)
+                ],[
+                    InlineKeyboardButton(text="ʜᴏᴡ ᴛᴏ ᴠᴇʀɪғʏ❓", url=tutorial_url)
+                ]]),
+                parse_mode=enums.ParseMode.HTML
+            )
             await asyncio.sleep(300) 
             await d.delete()
             await m.delete()
