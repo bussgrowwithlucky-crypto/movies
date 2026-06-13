@@ -266,14 +266,16 @@ def get_file_id(message: "Message") -> Any:
  #   return getattr(media, "file_unique_id", "")[:6]
 
 def get_status():
-    tz = pytz.timezone('Asia/Colombo')
+    tz = pytz.timezone('Asia/Kolkata')
     hour = datetime.now(tz).time().hour
     if 5 <= hour < 12:
-        sts = "𝐺𝑜𝑜𝑑 𝑀𝑜𝑟𝑛𝑖𝑛𝑔"
-    elif 12 <= hour < 18:
-        sts = "𝐺𝑜𝑜𝑑 𝐴𝑓𝑡𝑒𝑟𝑛𝑜𝑜𝑛"
+        sts = "𝐺𝑜𝑜𝑑 𝑀𝑜𝑟𝑛𝑖𝑛𝑔 🌅"
+    elif 12 <= hour < 17:
+        sts = "𝐺𝑜𝑜𝑑 𝐴𝑓𝑡𝑒𝑟𝑛𝑜𝑜𝑛 ☀️"
+    elif 17 <= hour < 21:
+        sts = "𝐺𝑜𝑜𝑑 𝐸𝑣𝑒𝑛𝑖𝑛𝑔 🌆"
     else:
-        sts = "𝐺𝑜𝑜𝑑 𝐸𝑣𝑒𝑛𝑖𝑛𝑔"
+        sts = "𝐺𝑜𝑜𝑑 𝑁𝑖𝑔ℎ𝑡 🌙"
     return sts
 
 async def is_check_admin(bot, chat_id, user_id):
