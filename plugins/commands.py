@@ -329,23 +329,34 @@ async def start(client:Client, message):
             verify_id = ''.join(random.choices(string.ascii_uppercase + string.digits, k=7))
             await db.create_verify_id(user_id, verify_id)
             temp.CHAT[user_id] = grp_id
-            verify = await get_shortlink(f"https://telegram.me/{temp.U_NAME}?start=notcopy_{user_id}_{verify_id}_{file_id}", grp_id, is_second_shortener, is_third_shortener , pm_mode=pm_mode)
-            buttons = [[
-                InlineKeyboardButton(text="🔐 ᴠᴇʀɪꜰʏ ɴᴏᴡ", url=verify)
-            ],[
-                InlineKeyboardButton(text="ʜᴏᴡ ᴛᴏ ᴠᴇʀɪғʏ❓", url=settings.get('tutorial') or TUTORIAL or "https://t.me/")
-            ]]
-            reply_markup=InlineKeyboardMarkup(buttons)
-            if await db.user_verified(user_id): 
+            raw_verify_link = f"https://telegram.me/{temp.U_NAME}?start=notcopy_{user_id}_{verify_id}_{file_id}"
+            verify = await get_shortlink(raw_verify_link, grp_id, is_second_shortener, is_third_shortener , pm_mode=pm_mode)
+            tutorial_url = settings.get('tutorial') or TUTORIAL or "https://t.me/"
+            if await db.user_verified(user_id):
                 msg = script.THIRDT_VERIFICATION_TEXT
-            else:            
+            else:
                 msg = script.SECOND_VERIFICATION_TEXT if is_second_shortener else script.VERIFICATION_TEXT
-            d = await m.reply_text(
-                text=msg.format(message.from_user.mention, get_status()),
-                protect_content = False,
-                reply_markup=reply_markup,
-                parse_mode=enums.ParseMode.HTML
-            )
+            try:
+                d = await m.reply_text(
+                    text=msg.format(message.from_user.mention, get_status()),
+                    protect_content = False,
+                    reply_markup=InlineKeyboardMarkup([[
+                        InlineKeyboardButton(text="🔐 ᴠᴇʀɪꜰʏ ɴᴏᴡ", url=verify)
+                    ],[
+                        InlineKeyboardButton(text="ʜᴏᴡ ᴛᴏ ᴠᴇʀɪғʏ❓", url=tutorial_url)
+                    ]]),
+                    parse_mode=enums.ParseMode.HTML
+                )
+            except Exception:
+                logger.exception("verify message failed, retrying with raw link")
+                d = await m.reply_text(
+                    text=msg.format(message.from_user.mention, get_status()),
+                    protect_content = False,
+                    reply_markup=InlineKeyboardMarkup([[
+                        InlineKeyboardButton(text="🔐 ᴠᴇʀɪꜰʏ ɴᴏᴡ", url=raw_verify_link)
+                    ]]),
+                    parse_mode=enums.ParseMode.HTML
+                )
             await asyncio.sleep(300) 
             await d.delete()
             await m.delete()
