@@ -218,7 +218,7 @@ STREAM_MODE = is_enabled(environ.get("STREAM_MODE", "True"), True)
 
 MULTI_CLIENT = False
 SLEEP_THRESHOLD = get_int("SLEEP_THRESHOLD", 60)
-PING_INTERVAL = get_int("PING_INTERVAL", 1200)
+PING_INTERVAL = get_int("PING_INTERVAL", 300)
 
 ON_HEROKU = True if "DYNO" in environ else False
 URL = environ.get("FQDN", "")
