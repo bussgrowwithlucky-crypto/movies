@@ -223,17 +223,24 @@ async def get_shortlink(link, grp_id, is_second_shortener=False, is_third_shorte
                     api, site = SHORTENER_API, SHORTENER_WEBSITE
         if not api or not site:
             return link
+        api = str(api).strip()
+        site = str(site).strip().replace("https://", "").replace("http://", "").strip("/").split("/")[0]
+        if not api or not site:
+            return link
         try:
             shortzy = Shortzy(api, site)
         except Exception:
             return link
+        short = None
         try:
-            link = await shortzy.convert(link)
+            short = await shortzy.convert(link)
         except Exception:
             try:
-                link = await shortzy.get_quick_link(link)
+                short = await shortzy.get_quick_link(link)
             except Exception:
                 pass
+        if short and str(short).startswith("http") and " " not in str(short):
+            return str(short)
     return link
 
 def get_file_id(message: "Message") -> Any:
