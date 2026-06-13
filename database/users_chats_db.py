@@ -21,6 +21,27 @@ class Database:
         self.grp_and_ids = fsubs.grp_and_ids
         self.movies_update_channel = mydb.movies_update_channel
         self.botcol = mydb.botcol
+        self.movie_requests = mydb.movie_requests
+    async def add_movie_request(self, user_id, query):
+        query = str(query).strip().lower()
+        if not query:
+            return False
+        existing = await self.movie_requests.find_one({"user_id": int(user_id), "query": query})
+        if existing:
+            return False
+        await self.movie_requests.insert_one({
+            "user_id": int(user_id),
+            "query": query,
+            "ts": datetime.datetime.utcnow()
+        })
+        return True
+
+    async def get_all_movie_requests(self):
+        return await self.movie_requests.find({}).to_list(length=1000)
+
+    async def delete_movie_request(self, _id):
+        await self.movie_requests.delete_one({"_id": _id})
+
     def new_user(self, id, name):
         return dict(
             id = id,
