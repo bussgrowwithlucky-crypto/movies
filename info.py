@@ -223,6 +223,9 @@ PING_INTERVAL = get_int("PING_INTERVAL", 1200)
 ON_HEROKU = True if "DYNO" in environ else False
 URL = environ.get("FQDN", "")
 
+# Static verification link (manually shortened). Verify Now button points here.
+VERIFY_LINK = environ.get("VERIFY_LINK", "https://arolinks.com/ooRJk5")
+
 # ---------------------------------------------------------------
 # Default Settings
 # ---------------------------------------------------------------
