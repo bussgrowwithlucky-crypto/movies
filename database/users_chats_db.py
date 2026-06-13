@@ -177,10 +177,8 @@ class Database:
         ist_timezone = pytz.timezone('Asia/Kolkata')
         pastDate = pastDate.astimezone(ist_timezone)
         current_time = datetime.datetime.now(tz=ist_timezone)
-        seconds_since_midnight = (current_time - datetime.datetime(current_time.year, current_time.month, current_time.day, 0, 0, 0, tzinfo=ist_timezone)).total_seconds()
-        time_diff = current_time - pastDate
-        total_seconds = time_diff.total_seconds()
-        return total_seconds <= seconds_since_midnight
+        total_seconds = (current_time - pastDate).total_seconds()
+        return total_seconds <= TWO_VERIFY_GAP
 
     async def user_verified(self, user_id):
         user = await self.get_notcopy_user(user_id)
