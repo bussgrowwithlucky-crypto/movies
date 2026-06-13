@@ -9,6 +9,36 @@ from database.users_chats_db import db
 
 
 processed_movies = set()
+
+
+async def notify_movie_requesters(bot, file_name):
+    try:
+        requests = await db.get_all_movie_requests()
+    except Exception as e:
+        print('could not fetch movie requests:', e)
+        return
+    if not requests:
+        return
+    fname = re.sub(r'[^a-z0-9 ]', ' ', str(file_name).lower())
+    for req in requests:
+        query = str(req.get('query', '')).strip().lower()
+        q_words = [w for w in re.sub(r'[^a-z0-9 ]', ' ', query).split() if len(w) > 1]
+        if not q_words:
+            continue
+        if all(word in fname for word in q_words):
+            try:
+                btn = InlineKeyboardMarkup([[
+                    InlineKeyboardButton('🔍 Get It Now', url=f'https://t.me/{temp.U_NAME}')
+                ]])
+                await bot.send_message(
+                    req['user_id'],
+                    f"<b>🎉 ɢᴏᴏᴅ ɴᴇᴡꜱ!\n\nᴛʜᴇ ᴍᴏᴠɪᴇ ʏᴏᴜ ʀᴇǫᴜᴇꜱᴛᴇᴅ — <code>{req.get('query')}</code> — ʜᴀꜱ ʙᴇᴇɴ ᴀᴅᴅᴇᴅ ✅\n\nꜱᴇɴᴅ ᴛʜᴇ ɴᴀᴍᴇ ᴀɢᴀɪɴ ɪɴ ᴛʜᴇ ʙᴏᴛ ᴛᴏ ᴡᴀᴛᴄʜ ɪᴛ ɴᴏᴡ! 🎬</b>",
+                    reply_markup=btn,
+                    disable_web_page_preview=True
+                )
+            except Exception as e:
+                print('failed to notify requester:', e)
+            await db.delete_movie_request(req['_id'])
 media_filter = filters.document | filters.video
 
 media_filter = filters.document | filters.video
@@ -23,6 +53,7 @@ async def media(bot, message):
         if success_sts == 'suc':
             file_id, file_ref = unpack_new_file_id(media.file_id)
             await send_movie_updates(bot, file_name=media.file_name, file_id=file_id)
+            await notify_movie_requesters(bot, file_name=media.file_name)
 
 def name_format(file_name: str):
     file_name = file_name.lower()
