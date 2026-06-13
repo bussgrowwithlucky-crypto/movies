@@ -20,9 +20,9 @@ logging.getLogger("aiohttp").setLevel(logging.ERROR)
 logging.getLogger("aiohttp.web").setLevel(logging.ERROR)
 
 
-from pyrogram import Client, __version__
+from pyrogram import Client, __version__, enums
 from pyrogram.raw.all import layer
-from database.ia_filterdb import Media
+from database.ia_filterdb import Media, save_file
 from database.users_chats_db import db
 from info import *
 from utils import temp
@@ -44,6 +44,31 @@ ppath = "plugins/*.py"
 files = glob.glob(ppath)
 JisshuBot.start()
 loop = asyncio.get_event_loop()
+
+
+async def catchup_index_channels():
+    # Index recent files added while the bot was asleep/offline (Render free tier sleeps).
+    await asyncio.sleep(15)
+    for chat_id in CHANNELS:
+        try:
+            saved = 0
+            async for message in JisshuBot.get_chat_history(chat_id, limit=200):
+                if not message.media:
+                    continue
+                if message.media not in [enums.MessageMediaType.VIDEO, enums.MessageMediaType.DOCUMENT]:
+                    continue
+                media = getattr(message, message.media.value, None)
+                if not media or media.mime_type not in ['video/mp4', 'video/x-matroska']:
+                    continue
+                media.caption = message.caption
+                try:
+                    if await save_file(media) == 'suc':
+                        saved += 1
+                except Exception:
+                    pass
+            logging.info(f"Startup catch-up index: saved {saved} new file(s) from {chat_id}")
+        except Exception as e:
+            logging.warning(f"Catch-up index failed for {chat_id}: {e}")
 
 
 async def Jisshu_start():
@@ -69,6 +94,7 @@ async def Jisshu_start():
     temp.BANNED_USERS = b_users
     temp.BANNED_CHATS = b_chats
     await Media.ensure_indexes()
+    asyncio.create_task(catchup_index_channels())
     me = await JisshuBot.get_me()
     temp.ME = me.id
     temp.U_NAME = me.username
