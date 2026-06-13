@@ -1420,7 +1420,18 @@ async def auto_filter(client, msg, spoll=False , pm_mode = False):
                 if message.chat.type != enums.ChatType.PRIVATE:
                     return await advantage_spell_chok(msg)
             if message.chat.type == enums.ChatType.PRIVATE:
-                return await message.reply_text(f"<b><i>😔 <code>{search}</code> ʜᴀꜱ ɴᴏᴛ ʙᴇᴇɴ ᴀᴅᴅᴇᴅ ʏᴇᴛ.\n\n⏳ ᴘʟᴇᴀꜱᴇ ᴡᴀɪᴛ ꜰᴏʀ ᴀ ᴍᴏᴍᴇɴᴛ, ɪᴛ ᴡɪʟʟ ʙᴇ ᴀᴅᴅᴇᴅ ꜱᴏᴏɴ.</i></b>")
+                if message.from_user:
+                    try:
+                        is_new = await db.add_movie_request(message.from_user.id, search)
+                        if is_new and LOG_CHANNEL:
+                            await client.send_message(
+                                LOG_CHANNEL,
+                                f"#MovieRequest\n\n🎬 <b>Movie:</b> <code>{search}</code>\n👤 <b>User:</b> {message.from_user.mention}\n🆔 <b>User ID:</b> <code>{message.from_user.id}</code>\n\n<i>Add this movie to the database channel and the user will be notified automatically.</i>",
+                                disable_web_page_preview=True
+                            )
+                    except Exception as e:
+                        print('movie request log failed:', e)
+                return await message.reply_text(f"<b><i>😔 <code>{search}</code> ʜᴀꜱ ɴᴏᴛ ʙᴇᴇɴ ᴀᴅᴅᴇᴅ ʏᴇᴛ.\n\n⏳ ᴘʟᴇᴀꜱᴇ ᴡᴀɪᴛ ꜰᴏʀ ᴀ ᴍᴏᴍᴇɴᴛ, ɪᴛ ᴡɪʟʟ ʙᴇ ᴀᴅᴅᴇᴅ ꜱᴏᴏɴ. ʏᴏᴜ ᴡɪʟʟ ʙᴇ ɴᴏᴛɪꜰɪᴇᴅ ᴡʜᴇɴ ɪᴛ'ꜱ ʀᴇᴀᴅʏ. ✅</i></b>")
             return
     else:
         settings = await get_settings(msg.message.chat.id , pm_mode=pm_mode)
